@@ -1,44 +1,66 @@
 package cz.utb.meteodenik.cv04.prehled
 
-class MestoJ(
-    var nazev: String? = null,
-    var teplota: Double? = null
-) {
-    fun popis(): String {
-        val n = nazev
-        val t = teplota
-        return if (n != null && t != null) "$n: $t C" else "neznámé"
-    }
+
+data class Mesto(
+    val nazev: String,
+    val teplota: Double
+)
+
+
+fun Double.jakoCelsia(): String = "$this C"
+
+fun Mesto.popis(): String = "$nazev: ${teplota.jakoCelsia()}"
+
+
+sealed interface StavPrehledu {
+    object Nacita : StavPrehledu
+    object Chyba : StavPrehledu
+    object Prazdno : StavPrehledu
+    data class Hotovo(val pocet: Int) : StavPrehledu
 }
 
-class Prehled {
-    var nacita: Boolean = false
-    var chyba: Boolean = false
-    var prazdno: Boolean = false
-    var mesta: MutableList<MestoJ> = mutableListOf()
 
-    fun textStavu(): String = when {
-        nacita -> "Načítám…"
-        chyba -> "Chyba"
-        prazdno -> "Nic tu není"
-        else -> "Měst: ${mesta.size}"
+class Prehled(private val mesta: List<Mesto>) {
+
+
+    private val stav: StavPrehledu = when {
+        mesta.isEmpty() -> StavPrehledu.Prazdno
+        else -> StavPrehledu.Hotovo(mesta.size)
     }
 
-    fun nejteplejsi(): MestoJ? = mesta.maxByOrNull { it.teplota ?: Double.NEGATIVE_INFINITY }
+
+    fun textStavu(): String = when (val s = stav) {
+        is StavPrehledu.Nacita -> "Načítám…"
+        is StavPrehledu.Chyba -> "Chyba"
+        is StavPrehledu.Prazdno -> "Nic tu není"
+        is StavPrehledu.Hotovo -> "Měst: ${s.pocet}"
+    }
+
+
+    fun nejteplejsi(): Mesto? = mesta.maxByOrNull { it.teplota }
 
     fun vypis() {
-        mesta.forEach { println(it.popis()) }
+
+        for (m in mesta) {
+            println(m.popis())
+        }
         println(textStavu())
-        nejteplejsi()?.let { nej ->
-            println("Nejtepleji: ${nej.nazev} (${nej.teplota} C)")
+
+        val nej = nejteplejsi()
+        if (nej != null) {
+            println("Nejtepleji: ${nej.nazev} (${nej.teplota.jakoCelsia()})")
         }
     }
 }
 
 fun main() {
-    val p = Prehled()
-    p.mesta.add(MestoJ("Zlín", 21.4))
-    p.mesta.add(MestoJ("Brno", 23.0))
-    p.mesta.add(MestoJ("Otrokovice", 20.9))
+
+    val p = Prehled(
+        listOf(
+            Mesto("Zlín", 21.4),
+            Mesto("Brno", 23.0),
+            Mesto("Otrokovice", 20.9)
+        )
+    )
     p.vypis()
 }

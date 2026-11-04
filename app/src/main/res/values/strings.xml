@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">MeteoDenik</string>
-    <string name="uvodni_text">Meteo deník — Martin B.</string>
-    <string name="text_po_kliknuti">Dnes je hnusně</string>
-    <string name="akce_zmen_text">Zítra bude taky</string>
+    <string name="app_name">MeteoDeník</string>
+    <string name="seznam_mest_nadpis">Přehled měst</string>
+    <string name="teplota_format">%1$.1f °C</string>
+    <string name="detail_nadpis">Detail města</string>
+    <string name="mesto_nezname">Neznámé město</string>
 </resources>
